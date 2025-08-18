@@ -347,4 +347,71 @@ plot(map_incerteza)
 
 # Adicionar máscara com reclassificação do SITS -----------------------------------------------------------------------------------------------------------
 
+tempdir_r <- "map_final_classificado"
+dir.create(tempdir_r, showWarnings = FALSE)
 
+## Gerar cubo do mapa classificado 
+
+cubo_map_class <- sits_cube(
+  source = "BDC",
+  collection = "SENTINEL-2-16D",
+  data_dir = tempdir_r, # A imagem classificada deve estar nesta pasta
+  parse_info = c("satellite", "sensor", 
+                 "tile", "start_date", "end_date",
+                 "band", "version"),
+  bands = "class",
+  labels = c("1" = "supressao", # Definir os pixels da imagem
+             "2" = "veg_natural"))
+
+view(cubo_map_class)
+
+## Visualizar mapa do cubo
+
+plot(cubo_map_class)
+
+## Gerar cubo da máscara PRODES
+
+tempdir_r <- "cl_reclassification"
+dir.create(tempdir_r, showWarnings = FALSE)
+
+### A imagem em formato .tif da máscara deve estar na pasta 'cl_reclassification'
+### e conter as informações citadas em "parse_info" do cubo abaixo:
+
+masc_prodes <- sits_cube(
+  source = "BDC",
+  collection = "SENTINEL-2-16D",
+  tiles      = "034018",
+  data_dir = tempdir_r,
+  parse_info = c("product", "sensor", 
+                 "tile", "start_date", "end_date",
+                 "band", "version"),
+  bands = "class",
+  version = "v22", # Versão do mapa PRODES para não confundir com mapa classificado
+  labels = c("1" = "mascara", "2" = "NA")) # Verificar pixel da máscara, talvez necessário reclassificar pixels
+
+view(masc_prodes)
+
+plot(masc_prodes)
+
+## Junção mapa classificado com máscara PRODES - Reclassificação
+
+tempdir_r <- "cl_reclassification"
+dir.create(tempdir_r, showWarnings = FALSE)
+getwd()
+
+reclas_2020_2B <- sits_reclassify(
+  cube = cubo_class_2B,
+  mask = prodes_2020_2B,
+  rules = list("Mascara_PRODES_2000-2019" = mask == "mascara",
+               #"Supressao_2019" = cube == "supressao",
+               "Vegetacao_natural" = cube == "veg_natural"),
+  multicores = 7,
+  output_dir = tempdir_r,
+  version = "reclass_final_2B277")
+
+sits_colors_set(tibble(
+  name = c("Supressao_2020","Vegetacao_natural","Mascara_PRODES_2000-2019"),
+  color = c("#bf812d", "#01665e", "black")))
+
+plot(reclas_2020_2B,
+     legend_text_size = 0.85)
