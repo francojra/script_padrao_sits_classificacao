@@ -213,9 +213,25 @@ avaliacao_som_limpo
 
 # Classificações ------------------------------------------------------------------------------------------------------------------------------------------
 
+## Leitura do primeiro cubo criado 
+
+cubo <- readRDS("cubo.rds")
+
+view(cubo)
 
 # Treinar modelo Random Forest ----------------------------------------------------------------------------------------------------------------------------
 
+## Treinar modelo com amostras limpas (VERIFICAR AMOSTRAS LIMPAS OU NÃO)
+
+set.seed(03024)
+
+rf_model <- sits_train(
+  samples = samples_clean, # Se precisar de amostras originais --> all_samples 
+  ml_method = sits_rfor()) # Modelo Random Forest
+
+## Gráfico com as variávies mais importantes do modelo
+
+plot(rf_model)
 
 # Validação do modelo Random Forest -----------------------------------------------------------------------------------------------------------------------
 
