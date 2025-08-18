@@ -97,12 +97,32 @@ cubo_amostras <- readRDS("cubo_amostras.rds")
 
 # Visualizar padrões de séries temporais por classe -------------------------------------------------------------------------------------------------------
 
+padroes_tempo_amostras <- sits_patterns(cubo_amostras) # Média harmônica das séries temporais 
+view(padroes_tempo_amostras$time_series[[1]])
+
 ## Gráfico
+
+plot(padroes_tempo_amostras)
 
 # Balanceamento de amostras -------------------------------------------------------------------------------------------------------------------------------
 
+cubo_amostras_bal <- sits_reduce_imbalance(
+  cubo_amostras,
+  n_samples_over = 100, 
+  n_samples_under = 100) 
+
+## Número de amostras não balanceadas e balanceadas
+
+summary(cubo_amostras) # Nº de amostras não balanceadas
+summary(cubo_amostras_bal) # Nº amostras balanceadas
 
 # Análise SOM ---------------------------------------------------------------------------------------------------------------------------------------------
+
+## Definir cores das classes
+
+sits_colors_set(tibble(
+  name = c("supressao", "veg_natural", "", "","", "", ""),
+  color = c("#bf812d", "#01665e", "", "", "", "", "")))
 
 
 # Seleção de neurônios no SOM -----------------------------------------------------------------------------------------------------------------------------
