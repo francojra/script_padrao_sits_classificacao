@@ -213,11 +213,11 @@ avaliacao_som_limpo
 
 # Classificações ------------------------------------------------------------------------------------------------------------------------------------------
 
-## Leitura do primeiro cubo criado 
+## Leitura do cubo criado com bandas e índices
 
-cubo <- readRDS("cubo.rds")
+cubo_indices_bandas <- readRDS("cubo_indices_bandas.rds")
 
-view(cubo)
+view(cubo_indices_bandas)
 
 # Treinar modelo Random Forest ----------------------------------------------------------------------------------------------------------------------------
 
@@ -235,21 +235,115 @@ plot(rf_model)
 
 # Validação do modelo Random Forest -----------------------------------------------------------------------------------------------------------------------
 
+set.seed(333)
+
+rfor_valid <- sits_kfold_validate(
+  samples    = samples_clean,
+  folds      = 5, 
+  ml_method  = sits_rfor(),
+  multicores = 5)
+
+rfor_valid 
 
 # Produzir mapas de probabilidades por classes ------------------------------------------------------------------------------------------------------------
 
+tempdir_r <- "mapa_prob"
+dir.create(tempdir_r, showWarnings = FALSE, recursive = TRUE)
+
+probs_class <- sits_classify(
+  data = cubo_indices_bandas, 
+  ml_model = rf_model,
+  multicores = 3,
+  memsize = 8,
+  output_dir = tempdir_r)
+
+## Salvar dados dos mapas de probabilidades
+
+saveRDS(probs_class, file = "probs_class.rds")
+probs_class <- readRDS("probs_class.rds")
 
 # Unir tiles com sits_mosaic() ----------------------------------------------------------------------------------------------------------------------------
 
+tempdir_r <- "mosaico_probs"
+dir.create(tempdir_r, showWarnings = FALSE, recursive = TRUE)
+
+mosaico_probs <- sits_mosaic(probs_class,
+                             output_dir = tempdir_r,
+                             multicores = 7,
+                             progress   = TRUE)
+
+view(mosaico_probs)
+
+## Visualizar tiles juntos em único mapa
+
+plot(mosaico_probs)
+
+## Salvar dados do mosaico de probabilidades
+
+saveRDS(mosaico_probs, file = "mosaico_probs.rds")
+mosaico_probs <- readRDS("mosaico_probs.rds")
 
 # Suavização dos mapas de probabilidades ------------------------------------------------------------------------------------------------------------------
 
+tempdir_r <- "mosaico_prob_suav"
+dir.create(tempdir_r, showWarnings = FALSE, recursive = TRUE)
+
+smooth_probs <- sits_smooth(
+  cube = mosaico_probs,
+  multicores = 7,
+  memsize = 15,
+  output_dir = tempdir_r)
+
+plot(smooth_probs)
+
+## Salvar dados do cubo suavizado
+
+saveRDS(smooth_probs, file = "smooth_probs.rds")
+smooth_probs <- readRDS("smooth_probs.rds")
 
 # Rotulando o cubo de probabilidades - Classificação do mapa final ----------------------------------------------------------------------------------------
 
+tempdir_r <- "map_classificado"
+dir.create(tempdir_r, showWarnings = FALSE, recursive = TRUE)
+
+map_class <- sits_label_classification(
+  cube = smooth_probs, 
+  output_dir = tempdir_r, 
+  memsize = 15,
+  multicores = 7)
+
+## Salvar dados do cubo classificado
+
+saveRDS(map_class, file = "map_class.rds")
+map_class <- readRDS("map_class.rds")
+
+## Visualizar mapa classificado
+
+### Definir cores das classes
+
+sits_colors_set(tibble(
+  name = c("supressao", "veg_natural", "", "","", "", "", ""),
+  color = c("#bf812d", "#01665e", "", "", "", "", "", "")))
+
+plot(map_class)
+class(map_class)
 
 # Mapa de incerteza ---------------------------------------------------------------------------------------------------------------------------------------
 
+tempdir_r <- "mapa_incerteza"
+dir.create(tempdir_r, showWarnings = FALSE, recursive = TRUE)
+
+map_incerteza <- sits_uncertainty(
+  cube = mosaico_probs, # Arquivo do cubo de probabilidades com mosaico
+  type = "margin",
+  output_dir = tempdir_r,
+  memsize = 12,
+  multicores = 4,
+  progress = TRUE)
+
+## Visualizar mapa de incerteza
+
+plot(map_incerteza) 
 
 # Adicionar máscara com reclassificação do SITS -----------------------------------------------------------------------------------------------------------
 
