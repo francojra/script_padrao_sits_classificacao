@@ -47,10 +47,10 @@ cubo <- readRDS("cubo.rds")
 ## Cubo com exemplos dos índices DBSI e NDII
 
 cubo_indice_dbsi <- sits_apply(cubo,
-                                                DBSI = ((B11 - 1) - B03) / ((B11 - 1) + B03) - NDVI,
-                                                normalized = FALSE,
-                                                output_dir = tempdir_r,
-                                                progress = TRUE
+                              DBSI = ((B11 - 1) - B03) / ((B11 - 1) + B03) - NDVI,
+                              normalized = FALSE,
+                              output_dir = tempdir_r,
+                              progress = TRUE
 )
 
 ## Caso necessário calcular outros índices, o objeto "cubo_indice_dbsi" acima deve
@@ -58,10 +58,10 @@ cubo_indice_dbsi <- sits_apply(cubo,
 ## índices, o cubo final com todos os índices deve ser salvo em formato .rds.
 
 cubo_indice_dbsi_ndii <- sits_apply(cubo_indice_dbsi,
-                                           NDII = (B08 - B11) / (B08 + B11),
-                                           normalized = FALSE,
-                                           output_dir = tempdir_r,
-                                           progress = TRUE
+                                    NDII = (B08 - B11) / (B08 + B11),
+                                    normalized = FALSE,
+                                    output_dir = tempdir_r,
+                                    progress = TRUE
 )
 
 ## Salvar e ler cubo final criado com os índices e bandas
@@ -81,7 +81,7 @@ cubo_amostras <- sits_get_data(
   label_attr = "", # Coluna que indica as classes das amostras (pontos)
   bands = c("", "", "", ""), 
   memsize = 8, # consumo de memória
-  multicores = 2, # Número de núcleos a serem usados. Quanto maior, mais rápido o processamento
+  multicores = 2, # Número de núcleos usados. Quanto maior, mais rápido o processamento
   progress = TRUE) # Acompanhar carregamento
 
 ## Verificar informações do cubo com amostras
