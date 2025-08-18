@@ -36,10 +36,35 @@ sits_timeline(cubo)
 view(cubo)
 view(cubo$file_info)
 
-## Salvar cubo 
+## Salvar e ler cubo criado
 
 saveRDS(cubo, file = "cubo.rds") 
 cubo <- readRDS("cubo.rds")
+
+# Calcular índices e adicionar ao cubo --------------------------------------------------------------------------------------------------------------------
+
+cubo_indice_dbsi <- sits_apply(cubo,
+                                                DBSI = ((B11 - 1) - B03) / ((B11 - 1) + B03) - NDVI,
+                                                normalized = FALSE,
+                                                output_dir = tempdir_r,
+                                                progress = TRUE
+)
+
+## Caso necessário calcular outros índices, o objeto "cubo_indice_dbsi" acima deve
+## ser adicionado ao novo sits_apply com o novo índice, após calcular todos os
+## índices, o cubo final com todos os índices deve ser salvo.
+
+cubo_indice_dbsi_ndii <- sits_apply(cubo_indice_dbsi,
+                                           NDII = (B08 - B11) / (B08 + B11),
+                                           normalized = FALSE,
+                                           output_dir = tempdir_r,
+                                           progress = TRUE
+)
+
+## Salvar e ler cubo final criado com os índices e bandas
+
+saveRDS(cubo_indice_dbsi_ndii, file = "cubo_indices_bandas.rds") 
+cubo_indices_bandas <- readRDS("cubo_indices_bandas.rds")
 
 # Ler arquivo .shp com amostras por classes ---------------------------------------------------------------------------------------------------------------
 
