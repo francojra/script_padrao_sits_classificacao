@@ -374,8 +374,8 @@ plot(cubo_map_class)
 tempdir_r <- "cl_reclassification"
 dir.create(tempdir_r, showWarnings = FALSE)
 
-### A imagem em formato .tif da máscara deve estar na pasta 'cl_reclassification'
-### e conter as informações citadas em "parse_info" do cubo abaixo:
+## A imagem em formato .tif da máscara deve estar na pasta 'cl_reclassification'
+## e conter as informações citadas em "parse_info" do cubo abaixo:
 
 masc_prodes <- sits_cube(
   source = "BDC",
@@ -387,7 +387,7 @@ masc_prodes <- sits_cube(
                  "band", "version"),
   bands = "class",
   version = "v22", # Versão do mapa PRODES para não confundir com mapa classificado
-  labels = c("1" = "mascara", "2" = "NA")) # Verificar pixel da máscara, talvez necessário reclassificar pixels
+  labels = c("1" = "mascara", "2" = "NA")) # Verificar pixel da máscara, talvez reclassificar pixels
 
 view(masc_prodes)
 
@@ -395,23 +395,24 @@ plot(masc_prodes)
 
 ## Junção mapa classificado com máscara PRODES - Reclassificação
 
-tempdir_r <- "cl_reclassification"
+tempdir_r <- "cl_reclassification1"
 dir.create(tempdir_r, showWarnings = FALSE)
-getwd()
 
-reclas_2020_2B <- sits_reclassify(
-  cube = cubo_class_2B,
-  mask = prodes_2020_2B,
+reclas_masc_map_class <- sits_reclassify(
+  cube = cubo_map_class, # Cubo do mapa classificado
+  mask = prodes_2020_2B, # Cubo da máscara PRODES
   rules = list("Mascara_PRODES_2000-2019" = mask == "mascara",
-               #"Supressao_2019" = cube == "supressao",
-               "Vegetacao_natural" = cube == "veg_natural"),
+               "Supressao" = cube == "supressao",
+               "Vegetacao_natural" = cube == "veg_natural"), # VERIFICAR
   multicores = 7,
   output_dir = tempdir_r,
-  version = "reclass_final_2B277")
+  version = "reclass")
 
 sits_colors_set(tibble(
-  name = c("Supressao_2020","Vegetacao_natural","Mascara_PRODES_2000-2019"),
-  color = c("#bf812d", "#01665e", "black")))
+  name = c("Mascara_PRODES", "Supressao","Vegetacao_natural","", "", "", "", ""),
+  color = c("white", "#bf812d", "#01665e","", "", "", "", "")))
 
-plot(reclas_2020_2B,
-     legend_text_size = 0.85)
+plot(reclas_masc_map_class,
+     legend_text_size = 0.7, 
+     legend_position = "outside",
+     scale = 1.0)
