@@ -121,12 +121,35 @@ summary(cubo_amostras_bal) # Nº amostras balanceadas
 ## Definir cores das classes
 
 sits_colors_set(tibble(
-  name = c("supressao", "veg_natural", "", "","", "", ""),
-  color = c("#bf812d", "#01665e", "", "", "", "", "")))
+  name = c("supressao", "veg_natural", "", "","", "", "", ""),
+  color = c("#bf812d", "#01665e", "", "", "", "", "", "")))
 
+## Com balanceamento
+
+som_cluster_bal <- sits_som_map(
+  data = cubo_amostras_bal, # SOM feito com o nosso grupo de amostras 
+  grid_xdim = 10, # Grade eixo x. Aqui é 10 x 10 para gerar 100 neurônios
+  grid_ydim = 10, # Grade eixo y
+  distance = "dtw", # Método de calcular a distância,
+  mode = "pbatch", # Gera o mesmo mapa SOM a cada run
+  rlen = 20) # Número de iterações (quantidade de vezes que o mapa é gerado)
+
+## Visualizar mapa SOM
+
+plot(som_cluster_bal, band = "DBSI") 
+plot(som_cluster_bal, band = "NDII")
+plot(som_cluster_bal, band = "B11")
 
 # Seleção de neurônios no SOM -----------------------------------------------------------------------------------------------------------------------------
 
+amostras_filt_neuro <- som_cluster_bal$data[som_cluster_bal$data$id_neuron == 25, ]
+view(amostras_filt_neuro)
+
+amostras_filt_neuro1 <- som_cluster_bal$data[som_cluster_bal$data$id_neuron == 2, ]
+view(amostras_filt_neuro1)
+
+amostras_filt_neuro2 <- som_cluster_bal$data[som_cluster_bal$data$id_neuron == 45, ]
+view(amostras_filt_neuro2)
 
 # Detectar ruídos das amostras ----------------------------------------------------------------------------------------------------------------------------
 
