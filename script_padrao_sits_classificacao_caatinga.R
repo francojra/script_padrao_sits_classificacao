@@ -111,7 +111,7 @@ cubo_amostras_bal <- sits_reduce_imbalance(
   n_samples_over = 100, 
   n_samples_under = 100) 
 
-## Número de amostras não balanceadas e balanceadas
+## Verificar proporção e nº de amostras balanceadas e não balanceadas
 
 summary(cubo_amostras) # Nº de amostras não balanceadas
 summary(cubo_amostras_bal) # Nº amostras balanceadas
@@ -126,8 +126,8 @@ sits_colors_set(tibble(
 
 ## Com balanceamento
 
-som_cluster_bal <- sits_som_map(
-  data = cubo_amostras_bal, # SOM feito com o nosso grupo de amostras 
+som_cluster <- sits_som_map(
+  data = cubo_amostras_bal, # SOM feito com grupo de amostras balanceadas (VERIFICAR!)
   grid_xdim = 10, # Grade eixo x. Aqui é 10 x 10 para gerar 100 neurônios
   grid_ydim = 10, # Grade eixo y
   distance = "dtw", # Método de calcular a distância,
@@ -136,35 +136,80 @@ som_cluster_bal <- sits_som_map(
 
 ## Visualizar mapa SOM
 
-plot(som_cluster_bal, band = "DBSI") 
-plot(som_cluster_bal, band = "NDII")
-plot(som_cluster_bal, band = "B11")
+windows(width = 9, height = 7)
+plot(som_cluster, band = "DBSI") 
+plot(som_cluster, band = "NDII")
+plot(som_cluster, band = "B11")
 
 # Seleção de neurônios no SOM -----------------------------------------------------------------------------------------------------------------------------
 
-amostras_filt_neuro <- som_cluster_bal$data[som_cluster_bal$data$id_neuron == 25, ]
+amostras_filt_neuro <- som_cluster$data[som_cluster$data$id_neuron == 25, ]
 view(amostras_filt_neuro)
 
-amostras_filt_neuro1 <- som_cluster_bal$data[som_cluster_bal$data$id_neuron == 2, ]
+amostras_filt_neuro1 <- som_cluster$data[som_cluster$data$id_neuron == 2, ]
 view(amostras_filt_neuro1)
 
-amostras_filt_neuro2 <- som_cluster_bal$data[som_cluster_bal$data$id_neuron == 45, ]
+amostras_filt_neuro2 <- som_cluster$data[som_cluster$data$id_neuron == 45, ]
 view(amostras_filt_neuro2)
 
 # Detectar ruídos das amostras ----------------------------------------------------------------------------------------------------------------------------
 
+all_samples <- sits_som_clean_samples(som_map = som_cluster, 
+                                      keep = c("clean", "analyze", "remove"))
+
+## Visualizar gráfico
+
+plot(all_samples)
+summary(all_samples) # Número de amostras (mesma quantidade das originais ou balanceadas)
 
 # Remover amostras ruidosas -------------------------------------------------------------------------------------------------------------------------------
 
+samples_clean <- sits_som_clean_samples(som_cluster,
+                                        keep = c("clean", "analyze"))
+
+## Visualizar gráfico
+
+plot(samples_clean)
+summary(samples_clean) # Número de amostras após filtro
 
 # Ver diferenças na quantidade de amostras antes e após filtragem -----------------------------------------------------------------------------------------
 
+summary(all_samples)
+summary(samples_clean) 
 
 # Gerar SOM dos dados sem ruídos --------------------------------------------------------------------------------------------------------------------------
 
+som_cluster_limpo <- sits_som_map(
+  data = samples_clean, # SOM feito com o nosso grupo de amostras 
+  grid_xdim = 10, # Aqui é 10 x 10 para gerar 100 neurônios
+  grid_ydim = 10,
+  mode = "pbatch", # Gera o mesmo mapa SOM a cada run
+  distance = "dtw", # Método para calcular a distância
+  rlen = 20) # Número de iterações
+
+## Visualizar mapa SOM limpo
+
+windows(width = 9, height = 7)
+plot(som_cluster_limpo, band = "DBSI")
+plot(som_cluster_limpo, band = "NDVI")
+plot(som_cluster_limpo, band = "B11")
 
 # Avaliar matriz de confusão das amostras antes e após filtragem ------------------------------------------------------------------------------------------
 
+## Função de avaliação
+
+avaliacao_som <- sits_som_evaluate_cluster(som_cluster)
+avaliacao_som_limpo <- sits_som_evaluate_cluster(som_cluster_limpo)
+
+## Gráficos
+
+plot(avaliacao_som)
+plot(avaliacao_som_limpo)
+
+## Resultados das avaliações
+
+avaliacao_som 
+avaliacao_som_limpo
 
 # Classificações ------------------------------------------------------------------------------------------------------------------------------------------
 
