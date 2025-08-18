@@ -30,9 +30,10 @@ cubo <- sits_cube(
   start_date = "", # Data inicial 
   end_date   = "") # Data final 
 
+## Verificar bandas, tempos e outras informações do cubo 
+
 sits_bands(cubo)
 sits_timeline(cubo)
-
 view(cubo)
 view(cubo$file_info)
 
@@ -43,6 +44,8 @@ cubo <- readRDS("cubo.rds")
 
 # Calcular índices e adicionar ao cubo --------------------------------------------------------------------------------------------------------------------
 
+## Cubo com exemplos dos índices DBSI e NDII
+
 cubo_indice_dbsi <- sits_apply(cubo,
                                                 DBSI = ((B11 - 1) - B03) / ((B11 - 1) + B03) - NDVI,
                                                 normalized = FALSE,
@@ -51,8 +54,8 @@ cubo_indice_dbsi <- sits_apply(cubo,
 )
 
 ## Caso necessário calcular outros índices, o objeto "cubo_indice_dbsi" acima deve
-## ser adicionado ao novo sits_apply com o novo índice, após calcular todos os
-## índices, o cubo final com todos os índices deve ser salvo.
+## ser adicionado ao novo sits_apply para calcular o novo índice. Após calcular todos os
+## índices, o cubo final com todos os índices deve ser salvo em formato .rds.
 
 cubo_indice_dbsi_ndii <- sits_apply(cubo_indice_dbsi,
                                            NDII = (B08 - B11) / (B08 + B11),
@@ -68,10 +71,29 @@ cubo_indices_bandas <- readRDS("cubo_indices_bandas.rds")
 
 # Ler arquivo .shp com amostras por classes ---------------------------------------------------------------------------------------------------------------
 
+amostras_classes <- sf::read_sf("amostras_classes.shp")
 
 # Adicionar amostras ao cubo de dados criado --------------------------------------------------------------------------------------------------------------
 
-## Salvar cubo com amostras
+cubo_amostras <- sits_get_data(
+  cubo_tile034018_entorno_g4_2b, # Cubo geral com bandas e índices
+  samples = "amostras_classes.shp", # Arquivo shapefile do tile 034018
+  label_attr = "", # Coluna que indica as classes das amostras (pontos)
+  bands = c("", "", "", ""), 
+  memsize = 8, # consumo de memória
+  multicores = 2, # Número de núcleos a serem usados. Quanto maior, mais rápido o processamento
+  progress = TRUE) # Acompanhar carregamento
+
+## Verificar informações do cubo com amostras
+
+view(cubo_amostras)
+sits_bands(cubo_amostras)
+sits_labels(cubo_amostras)
+
+## Salvar e ler cubo com amostras
+
+saveRDS(cubo_amostras, file = "cubo_amostras.rds") 
+cubo_amostras <- readRDS("cubo_amostras.rds")
 
 # Visualizar padrões de séries temporais por classe -------------------------------------------------------------------------------------------------------
 
