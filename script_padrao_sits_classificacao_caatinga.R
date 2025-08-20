@@ -164,8 +164,8 @@ summary(samples_clean)
 
 som_cluster_limpo <- sits_som_map(
   data      = samples_clean, # SOM feito com o nosso grupo de amostras
-  grid_xdim = 10,            # 10 x 10 para gerar 100 neurônios - eixo x
-  grid_ydim = 10,            # 10 x 10 para gerar 100 neurônios - eixo y
+  grid_xdim = 10,            # 10 x 10 para gerar 100 neurônios - grade eixo x
+  grid_ydim = 10,            # 10 x 10 para gerar 100 neurônios - grade eixo y
   mode      = "pbatch",      # Gera o mesmo mapa SOM a cada run
   distance  = "dtw",         # Método para calcular a distância
   rlen      = 20             # Número de iterações
