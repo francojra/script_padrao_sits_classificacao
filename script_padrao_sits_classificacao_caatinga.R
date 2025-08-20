@@ -53,11 +53,11 @@ amostras_classes <- sf::read_sf("amostras_classes.shp")
 
 cubo_amostras <- sits_get_data(
   cubo_tile034018_entorno_g4_2b,       # Cubo geral com bandas e índices
-  samples    = "amostras_classes.shp", # Arquivo shapefile do tile 034018
+  samples    = "",                     # Arquivo shapefile do tile 034018
   label_attr = "",                     # Coluna que indica as classes das amostras (pontos)
   bands      = c("", "", "", ""),      # Seleção de bandas das amostras
   memsize    = 8,                      # consumo de memória
-  multicores = 2,                      # Número de núcleos usados. Quanto maior, mais rápido processamento
+  multicores = 2,                      # Número de núcleos usados. Quanto maior, mais rápido 
   progress   = TRUE                    # Acompanhar carregamento
 )
 
@@ -145,7 +145,7 @@ all_samples <- sits_som_clean_samples(
 plot(all_samples)
 summary(all_samples) # Número de amostras (mesma quantidade das originais ou balanceadas)
 
-# Remover amostras ruidosas -------------------------------------------------------------------------------------------------------------------------------
+# Remover amostras ruidosas - OPCIONAL --------------------------------------------------------------------------------------------------------------------
 
 samples_clean <- sits_som_clean_samples(som_cluster,
   keep = c("clean", "analyze")
@@ -164,7 +164,7 @@ summary(samples_clean)
 # Gerar SOM dos dados sem ruídos --------------------------------------------------------------------------------------------------------------------------
 
 som_cluster_limpo <- sits_som_map(
-  data      = samples_clean, # SOM feito com o nosso grupo de amostras
+  data      = samples_clean, # SOM feito com o grupo de amostras limpas
   grid_xdim = 10,            # 10 x 10 para gerar 100 neurônios - grade eixo x
   grid_ydim = 10,            # 10 x 10 para gerar 100 neurônios - grade eixo y
   mode      = "pbatch",      # Gera o mesmo mapa SOM a cada run
@@ -199,7 +199,7 @@ avaliacao_som_limpo
 
 # Classificações ------------------------------------------------------------------------------------------------------------------------------------------
 
-## Leitura do cubo criado com bandas e índices
+## Leitura do cubo criado (primeiro cubo) com bandas e índices selecionados
 
 cubo_indices_bandas <- readRDS("cubo_indices_bandas.rds")
 
@@ -225,7 +225,7 @@ plot(rf_model)
 set.seed(333)
 
 rfor_valid <- sits_kfold_validate(
-  samples    = samples_clean, # Verificar amostras originais ou filtradas
+  samples    = samples_clean, # Verificar se são amostras originais ou filtradas
   folds      = 5,
   ml_method  = sits_rfor(),
   multicores = 5
@@ -251,7 +251,7 @@ probs_class <- sits_classify(
 saveRDS(probs_class, file = "probs_class.rds")
 probs_class <- readRDS("probs_class.rds")
 
-# Unir tiles com sits_mosaic() ----------------------------------------------------------------------------------------------------------------------------
+# Unir tiles com sits_mosaic() - OPCIONAL -----------------------------------------------------------------------------------------------------------------
 
 tempdir_r <- "mosaico_probs"
 dir.create(tempdir_r, showWarnings = FALSE, recursive = TRUE)
@@ -338,88 +338,3 @@ map_incerteza <- sits_uncertainty(
 ## Visualizar mapa de incerteza
 
 plot(map_incerteza)
-
-# Adicionar máscara com reclassificação do SITS -----------------------------------------------------------------------------------------------------------
-
-tempdir_r <- "map_final_classificado"
-dir.create(tempdir_r, showWarnings = FALSE)
-
-## Gerar cubo do mapa classificado
-
-cubo_map_class <- sits_cube(
-  source     = "BDC",
-  collection = "SENTINEL-2-16D",
-  data_dir   = tempdir_r,   # A imagem classificada deve estar nesta pasta
-  parse_info = c(
-    "satellite", "sensor",
-    "tile", "start_date", "end_date",
-    "band", "version"
-  ),
-  bands      = "class",
-  labels     = c(
-    "1"      = "supressao", # Definir os pixels da imagem
-    "2"      = "veg_natural"
-  )
-)
-
-view(cubo_map_class)
-
-## Visualizar mapa do cubo
-
-plot(cubo_map_class)
-
-## Gerar cubo da máscara PRODES
-
-tempdir_r <- "cl_reclassification"
-dir.create(tempdir_r, showWarnings = FALSE)
-
-## A imagem em formato .tif da máscara deve estar na pasta 'cl_reclassification'
-## e conter as informações citadas em "parse_info" do cubo abaixo:
-
-masc_prodes <- sits_cube(
-  source     = "BDC",
-  collection = "SENTINEL-2-16D",
-  tiles      = "034018",
-  data_dir   = tempdir_r,
-  parse_info = c(
-    "product", "sensor",
-    "tile", "start_date", "end_date",
-    "band", "version"
-  ),
-  bands      = "class",
-  version    = "v22", # Versão do mapa PRODES para não confundir com mapa classificado
-  labels     = c("1" = "mascara", "2" = "NA") 
-)
-
-view(masc_prodes)
-
-plot(masc_prodes)
-
-## Junção mapa classificado com máscara PRODES - Reclassificação
-
-tempdir_r <- "cl_reclassification1"
-dir.create(tempdir_r, showWarnings = FALSE)
-
-reclas_masc_map_class <- sits_reclassify(
-  cube                         = cubo_map_class, # Cubo do mapa classificado
-  mask                         = masc_prodes,    # Cubo da máscara PRODES
-  rules                        = list(
-    "Mascara_PRODES_2000-2019" = mask == "mascara",
-    "Supressao"                = cube == "supressao",
-    "Vegetacao_natural"        = cube == "veg_natural"
-  ),
-  multicores                   = 7,
-  output_dir                   = tempdir_r,
-  version                      = "reclass"
-)
-
-sits_colors_set(tibble(
-  name  = c("Mascara_PRODES", "Supressao", "Vegetacao_natural", "", "", "", "", ""),
-  color = c("white", "#bf812d", "#01665e", "", "", "", "", "")
-))
-
-plot(reclas_masc_map_class,
-  legend_text_size = 0.7,
-  legend_position  = "outside",
-  scale            = 1.0
-)
