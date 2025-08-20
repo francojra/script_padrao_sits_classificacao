@@ -17,7 +17,7 @@ library(luz) # Pacote para facilitar criação, treino e avaliação de modelos 
 library(torch) # Pacote para criar modelos deep learning e treinar redes neurais
 torch::install_torch()
 library(tidyverse) # Pacote para manipulação de tabelas e gráficos
-library(terra) # Pacote para manipular dados espaciais (imagens raster, dados de satélite)
+library(terra) # Pacote para manipular dados espaciais (imagens raster)
 library(raster) # Pacote mais antigo para manipulação de dados raster
 library(sf) # Pacote para manipulação de dados vetoriais (pontos, linhas, polígonos)
 
@@ -29,7 +29,7 @@ cubo <- sits_cube(
   tiles      = c("", "", ""), # Tiles/Regiões de ineteresse
   start_date = "", # Data inicial
   end_date   = "" # Data final
-) 
+)
 
 ## Verificar bandas, tempos e outras informações do cubo
 
@@ -42,33 +42,6 @@ view(cubo$file_info)
 
 saveRDS(cubo, file = "cubo.rds")
 cubo <- readRDS("cubo.rds")
-
-# Calcular índices e adicionar ao cubo --------------------------------------------------------------------------------------------------------------------
-
-## Cubo com exemplos dos índices DBSI e NDII
-
-# cubo_indice_dbsi <- sits_apply(cubo,
-#                               DBSI = ((B11 - 1) - B03) / ((B11 - 1) + B03) - NDVI,
-#                               normalized = FALSE,
-#                               output_dir = tempdir_r,
-#                               progress = TRUE
-# )
-#
-# ## Caso necessário calcular outros índices, o objeto "cubo_indice_dbsi" acima deve
-# ## ser adicionado ao novo sits_apply para calcular o novo índice. Após calcular todos os
-# ## índices, o cubo final com todos os índices deve ser salvo em formato .rds.
-#
-# cubo_indice_dbsi_ndii <- sits_apply(cubo_indice_dbsi,
-#                                     NDII = (B08 - B11) / (B08 + B11),
-#                                     normalized = FALSE,
-#                                     output_dir = tempdir_r,
-#                                     progress = TRUE
-# )
-#
-# ## Salvar e ler cubo final criado com os índices e bandas
-#
-# saveRDS(cubo_indice_dbsi_ndii, file = "cubo_indices_bandas.rds")
-# cubo_indices_bandas <- readRDS("cubo_indices_bandas.rds")
 
 # Ler arquivo .shp com amostras por classes ---------------------------------------------------------------------------------------------------------------
 
@@ -84,7 +57,7 @@ cubo_amostras <- sits_get_data(
   memsize = 8, # consumo de memória
   multicores = 2, # Número de núcleos usados. Quanto maior, mais rápido o processamento
   progress = TRUE # Acompanhar carregamento
-) 
+)
 
 ## Verificar informações do cubo com amostras
 
@@ -136,8 +109,8 @@ som_cluster <- sits_som_map(
   grid_ydim = 10, # Grade eixo y
   distance = "dtw", # Método de calcular a distância,
   mode = "pbatch", # Gera o mesmo mapa SOM a cada run
-  rlen = 20   # Número de iterações (quantidade de vezes que o mapa é gerado
-) 
+  rlen = 20 # Número de iterações (quantidade de vezes que o mapa é gerado
+)
 
 ## Visualizar mapa SOM
 
@@ -193,8 +166,8 @@ som_cluster_limpo <- sits_som_map(
   grid_ydim = 10,
   mode = "pbatch", # Gera o mesmo mapa SOM a cada run
   distance = "dtw", # Método para calcular a distância
-  rlen = 20  # Número de iterações
-) 
+  rlen = 20 # Número de iterações
+)
 
 ## Visualizar mapa SOM limpo
 
@@ -237,7 +210,7 @@ set.seed(03024)
 rf_model <- sits_train(
   samples = samples_clean, # Se precisar de amostras originais --> all_samples
   ml_method = sits_rfor() # Modelo Random Forest
-) 
+)
 
 ## Gráfico com as variávies mais importantes do modelo
 
@@ -412,7 +385,7 @@ masc_prodes <- sits_cube(
   bands = "class",
   version = "v22", # Versão do mapa PRODES para não confundir com mapa classificado
   labels = c("1" = "mascara", "2" = "NA") # Verificar pixel da máscara
-) 
+)
 
 view(masc_prodes)
 
@@ -430,7 +403,7 @@ reclas_masc_map_class <- sits_reclassify(
     "Mascara_PRODES_2000-2019" = mask == "mascara",
     "Supressao" = cube == "supressao",
     "Vegetacao_natural" = cube == "veg_natural"
-  ), 
+  ),
   multicores = 7,
   output_dir = tempdir_r,
   version = "reclass"
