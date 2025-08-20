@@ -8,27 +8,27 @@
 
 # Carregar pacotes ----------------------------------------------------------------------------------------------------------------------------------------
 
-library(tibble) # Pacote para visualizar tabelas
-library(sits) # Pacote para análises de séries temporais de imagens de satélite
-library(sitsdata) # Pacote para obter conjunto de dados de amostras do sits
-library(kohonen) # Pacote para plotar o mapa SOM
+library(tibble)    # Pacote para visualizar tabelas
+library(sits)      # Pacote para análises de séries temporais de imagens de satélite
+library(sitsdata)  # Pacote para obter conjunto de dados de amostras do sits
+library(kohonen)   # Pacote para plotar o mapa SOM
 library(randomForestExplainer) # Pacote para treinar modelo de classificação
-library(luz) # Pacote para facilitar criação, treino e avaliação de modelos no Torch
-library(torch) # Pacote para criar modelos deep learning e treinar redes neurais
+library(luz)       # Pacote para facilitar criação, treino e avaliação de modelos no Torch
+library(torch)     # Pacote para criar modelos deep learning e treinar redes neurais
 torch::install_torch()
 library(tidyverse) # Pacote para manipulação de tabelas e gráficos
-library(terra) # Pacote para manipular dados espaciais (imagens raster)
-library(raster) # Pacote mais antigo para manipulação de dados raster
-library(sf) # Pacote para manipulação de dados vetoriais (pontos, linhas, polígonos)
+library(terra)     # Pacote para manipular dados espaciais (imagens raster)
+library(raster)    # Pacote mais antigo para manipulação de dados raster
+library(sf)        # Pacote para manipulação de dados vetoriais (pontos, linhas, polígonos)
 
 # Criar e ler cubo de dados -------------------------------------------------------------------------------------------------------------------------------
 
 cubo <- sits_cube(
-  source     = "BDC", # Fonte dos cubos de dados
+  source     = "BDC",            # Fonte dos cubos de dados
   collection = "SENTINEL-2-16D", # Coleção de imagens
-  tiles      = c("", "", ""), # Tiles/Regiões de ineteresse
-  start_date = "", # Data inicial
-  end_date   = "" # Data final
+  tiles      = c("", "", ""),    # Tiles/Regiões de ineteresse
+  start_date = "",               # Data inicial
+  end_date   = ""                # Data final
 )
 
 ## Verificar bandas, tempos e outras informações do cubo
@@ -52,13 +52,13 @@ amostras_classes <- sf::read_sf("amostras_classes.shp")
 # Adicionar amostras ao cubo de dados criado --------------------------------------------------------------------------------------------------------------
 
 cubo_amostras <- sits_get_data(
-  cubo_tile034018_entorno_g4_2b, # Cubo geral com bandas e índices
+  cubo_tile034018_entorno_g4_2b,       # Cubo geral com bandas e índices
   samples    = "amostras_classes.shp", # Arquivo shapefile do tile 034018
-  label_attr = "", # Coluna que indica as classes das amostras (pontos)
-  bands      = c("", "", "", ""), # Seleção de bandas das amostras
-  memsize    = 8, # consumo de memória
-  multicores = 2, # Número de núcleos usados. Quanto maior, mais rápido o processamento
-  progress   = TRUE # Acompanhar carregamento
+  label_attr = "",                     # Coluna que indica as classes das amostras (pontos)
+  bands      = c("", "", "", ""),      # Seleção de bandas das amostras
+  memsize    = 8,                      # consumo de memória
+  multicores = 2,                      # Número de núcleos usados. Quanto maior, mais rápido processamento
+  progress   = TRUE                    # Acompanhar carregamento
 )
 
 ## Verificar informações do cubo com amostras
