@@ -388,7 +388,7 @@ masc_prodes <- sits_cube(
   ),
   bands      = "class",
   version    = "v22", # Versão do mapa PRODES para não confundir com mapa classificado
-  labels     = c("1" = "mascara", "2" = "NA") # Verificar pixel da máscara
+  labels     = c("1" = "mascara", "2" = "NA") 
 )
 
 view(masc_prodes)
