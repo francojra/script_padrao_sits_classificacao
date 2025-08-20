@@ -85,7 +85,7 @@ plot(padroes_tempo_amostras)
 
 cubo_amostras_bal <- sits_reduce_imbalance(
   cubo_amostras,
-  n_samples_over = 100,
+  n_samples_over  = 100,
   n_samples_under = 100
 )
 
@@ -99,19 +99,19 @@ summary(cubo_amostras_bal) # Nº amostras balanceadas
 ## Definir cores das classes
 
 sits_colors_set(tibble(
-  name = c("supressao", "veg_natural", "", "", "", "", "", ""),
+  name  = c("supressao", "veg_natural", "", "", "", "", "", ""),
   color = c("#bf812d", "#01665e", "", "", "", "", "", "")
 ))
 
 ## Com balanceamento
 
 som_cluster <- sits_som_map(
-  data = cubo_amostras_bal, # SOM feito com grupo de amostras balanceadas (VERIFICAR!)
+  data      = cubo_amostras_bal, # SOM feito com grupo de amostras balanceadas (VERIFICAR!)
   grid_xdim = 10, # Grade eixo x. Aqui é 10 x 10 para gerar 100 neurônios
   grid_ydim = 10, # Grade eixo y
-  distance = "dtw", # Método de calcular a distância,
-  mode = "pbatch", # Gera o mesmo mapa SOM a cada run
-  rlen = 20 # Número de iterações (quantidade de vezes que o mapa é gerado
+  distance  = "dtw", # Método de calcular a distância,
+  mode      = "pbatch", # Gera o mesmo mapa SOM a cada run
+  rlen      = 20 # Número de iterações (quantidade de vezes que o mapa é gerado
 )
 
 ## Visualizar mapa SOM
@@ -123,7 +123,7 @@ plot(som_cluster, band = "B11")
 
 # Seleção de neurônios no SOM -----------------------------------------------------------------------------------------------------------------------------
 
-amostras_filt_neuro <- som_cluster$data[som_cluster$data$id_neuron == 25, ]
+amostras_filt_neuro  <- som_cluster$data[som_cluster$data$id_neuron == 25, ]
 view(amostras_filt_neuro)
 
 amostras_filt_neuro1 <- som_cluster$data[som_cluster$data$id_neuron == 2, ]
@@ -136,7 +136,7 @@ view(amostras_filt_neuro2)
 
 all_samples <- sits_som_clean_samples(
   som_map = som_cluster,
-  keep = c("clean", "analyze", "remove")
+  keep    = c("clean", "analyze", "remove")
 )
 
 ## Visualizar gráfico
@@ -163,12 +163,12 @@ summary(samples_clean)
 # Gerar SOM dos dados sem ruídos --------------------------------------------------------------------------------------------------------------------------
 
 som_cluster_limpo <- sits_som_map(
-  data = samples_clean, # SOM feito com o nosso grupo de amostras
+  data      = samples_clean, # SOM feito com o nosso grupo de amostras
   grid_xdim = 10, # Aqui é 10 x 10 para gerar 100 neurônios
   grid_ydim = 10,
-  mode = "pbatch", # Gera o mesmo mapa SOM a cada run
-  distance = "dtw", # Método para calcular a distância
-  rlen = 20 # Número de iterações
+  mode      = "pbatch", # Gera o mesmo mapa SOM a cada run
+  distance  = "dtw", # Método para calcular a distância
+  rlen      = 20 # Número de iterações
 )
 
 ## Visualizar mapa SOM limpo
@@ -210,7 +210,7 @@ view(cubo_indices_bandas)
 set.seed(03024)
 
 rf_model <- sits_train(
-  samples = samples_clean, # Se precisar de amostras originais --> all_samples
+  samples   = samples_clean, # Se precisar de amostras originais --> all_samples
   ml_method = sits_rfor() # Modelo Random Forest
 )
 
@@ -237,10 +237,10 @@ tempdir_r <- "mapa_prob"
 dir.create(tempdir_r, showWarnings = FALSE, recursive = TRUE)
 
 probs_class <- sits_classify(
-  data = cubo_indices_bandas,
-  ml_model = rf_model,
+  data       = cubo_indices_bandas,
+  ml_model   = rf_model,
   multicores = 3,
-  memsize = 8,
+  memsize    = 8,
   output_dir = tempdir_r
 )
 
@@ -277,9 +277,9 @@ tempdir_r <- "mosaico_prob_suav"
 dir.create(tempdir_r, showWarnings = FALSE, recursive = TRUE)
 
 smooth_probs <- sits_smooth(
-  cube = mosaico_probs,
+  cube       = mosaico_probs,
   multicores = 7,
-  memsize = 15,
+  memsize    = 15,
   output_dir = tempdir_r
 )
 
@@ -296,9 +296,9 @@ tempdir_r <- "map_classificado"
 dir.create(tempdir_r, showWarnings = FALSE, recursive = TRUE)
 
 map_class <- sits_label_classification(
-  cube = smooth_probs,
+  cube       = smooth_probs,
   output_dir = tempdir_r,
-  memsize = 15,
+  memsize    = 15,
   multicores = 7
 )
 
@@ -312,7 +312,7 @@ map_class <- readRDS("map_class.rds")
 ### Definir cores das classes
 
 sits_colors_set(tibble(
-  name = c("supressao", "veg_natural", "", "", "", "", "", ""),
+  name  = c("supressao", "veg_natural", "", "", "", "", "", ""),
   color = c("#bf812d", "#01665e", "", "", "", "", "", "")
 ))
 
@@ -325,12 +325,12 @@ tempdir_r <- "mapa_incerteza"
 dir.create(tempdir_r, showWarnings = FALSE, recursive = TRUE)
 
 map_incerteza <- sits_uncertainty(
-  cube = mosaico_probs, # Arquivo do cubo de probabilidades com mosaico
-  type = "margin",
+  cube       = mosaico_probs, # Arquivo do cubo de probabilidades com mosaico
+  type       = "margin",
   output_dir = tempdir_r,
-  memsize = 12,
+  memsize    = 12,
   multicores = 4,
-  progress = TRUE
+  progress   = TRUE
 )
 
 ## Visualizar mapa de incerteza
@@ -345,18 +345,18 @@ dir.create(tempdir_r, showWarnings = FALSE)
 ## Gerar cubo do mapa classificado
 
 cubo_map_class <- sits_cube(
-  source = "BDC",
+  source     = "BDC",
   collection = "SENTINEL-2-16D",
-  data_dir = tempdir_r, # A imagem classificada deve estar nesta pasta
+  data_dir   = tempdir_r, # A imagem classificada deve estar nesta pasta
   parse_info = c(
     "satellite", "sensor",
     "tile", "start_date", "end_date",
     "band", "version"
   ),
-  bands = "class",
-  labels = c(
-    "1" = "supressao", # Definir os pixels da imagem
-    "2" = "veg_natural"
+  bands      = "class",
+  labels     = c(
+    "1"      = "supressao", # Definir os pixels da imagem
+    "2"      = "veg_natural"
   )
 )
 
@@ -375,18 +375,18 @@ dir.create(tempdir_r, showWarnings = FALSE)
 ## e conter as informações citadas em "parse_info" do cubo abaixo:
 
 masc_prodes <- sits_cube(
-  source = "BDC",
+  source     = "BDC",
   collection = "SENTINEL-2-16D",
-  tiles = "034018",
-  data_dir = tempdir_r,
+  tiles      = "034018",
+  data_dir   = tempdir_r,
   parse_info = c(
     "product", "sensor",
     "tile", "start_date", "end_date",
     "band", "version"
   ),
-  bands = "class",
-  version = "v22", # Versão do mapa PRODES para não confundir com mapa classificado
-  labels = c("1" = "mascara", "2" = "NA") # Verificar pixel da máscara
+  bands      = "class",
+  version    = "v22", # Versão do mapa PRODES para não confundir com mapa classificado
+  labels     = c("1" = "mascara", "2" = "NA") # Verificar pixel da máscara
 )
 
 view(masc_prodes)
@@ -399,25 +399,25 @@ tempdir_r <- "cl_reclassification1"
 dir.create(tempdir_r, showWarnings = FALSE)
 
 reclas_masc_map_class <- sits_reclassify(
-  cube = cubo_map_class, # Cubo do mapa classificado
-  mask = prodes_2020_2B, # Cubo da máscara PRODES
-  rules = list(
+  cube                         = cubo_map_class, # Cubo do mapa classificado
+  mask                         = prodes_2020_2B, # Cubo da máscara PRODES
+  rules                        = list(
     "Mascara_PRODES_2000-2019" = mask == "mascara",
-    "Supressao" = cube == "supressao",
-    "Vegetacao_natural" = cube == "veg_natural"
+    "Supressao"                = cube == "supressao",
+    "Vegetacao_natural"        = cube == "veg_natural"
   ),
-  multicores = 7,
-  output_dir = tempdir_r,
-  version = "reclass"
+  multicores                   = 7,
+  output_dir                   = tempdir_r,
+  version                      = "reclass"
 )
 
 sits_colors_set(tibble(
-  name = c("Mascara_PRODES", "Supressao", "Vegetacao_natural", "", "", "", "", ""),
+  name  = c("Mascara_PRODES", "Supressao", "Vegetacao_natural", "", "", "", "", ""),
   color = c("white", "#bf812d", "#01665e", "", "", "", "", "")
 ))
 
 plot(reclas_masc_map_class,
   legend_text_size = 0.7,
-  legend_position = "outside",
-  scale = 1.0
+  legend_position  = "outside",
+  scale            = 1.0
 )
