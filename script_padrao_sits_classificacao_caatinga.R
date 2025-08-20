@@ -103,12 +103,12 @@ sits_colors_set(tibble(
   color = c("#bf812d", "#01665e", "", "", "", "", "", "")
 ))
 
-## Com balanceamento
+## SOM com balanceamento ou sem balanceamento
 
 som_cluster <- sits_som_map(
-  data      = cubo_amostras_bal, # SOM feito com grupo de amostras balanceadas (VERIFICAR!)
-  grid_xdim = 10,                # Grade eixo x. Aqui é 10 x 10 para gerar 100 neurônios
-  grid_ydim = 10,                # Grade eixo y
+  data      = cubo_amostras_bal, # SOM feito com grupo de amostras balanceadas 
+  grid_xdim = 10,                # 10 x 10 para gerar 100 neurônios - grade eixo x
+  grid_ydim = 10,                # 10 x 10 para gerar 100 neurônios - grade eixo y
   distance  = "dtw",             # Método de calcular a distância,
   mode      = "pbatch",          # Gera o mesmo mapa SOM a cada run
   rlen      = 20                 # Número de iterações (quantidade de vezes que o mapa é gerado
@@ -164,8 +164,8 @@ summary(samples_clean)
 
 som_cluster_limpo <- sits_som_map(
   data      = samples_clean, # SOM feito com o nosso grupo de amostras
-  grid_xdim = 10,            # 10 x 10 para gerar 100 neurônios
-  grid_ydim = 10,
+  grid_xdim = 10,            # 10 x 10 para gerar 100 neurônios - eixo x
+  grid_ydim = 10,            # 10 x 10 para gerar 100 neurônios - eixo y
   mode      = "pbatch",      # Gera o mesmo mapa SOM a cada run
   distance  = "dtw",         # Método para calcular a distância
   rlen      = 20             # Número de iterações
