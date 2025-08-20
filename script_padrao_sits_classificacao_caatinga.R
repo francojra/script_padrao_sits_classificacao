@@ -117,8 +117,8 @@ som_cluster <- sits_som_map(
 ## Visualizar mapa SOM
 
 windows(width = 9, height = 7)
-plot(som_cluster, band = "DBSI")
-plot(som_cluster, band = "NDII")
+plot(som_cluster, band = "B02")
+plot(som_cluster, band = "B04")
 plot(som_cluster, band = "B11")
 
 # Seleção de neurônios no SOM -----------------------------------------------------------------------------------------------------------------------------
@@ -174,8 +174,8 @@ som_cluster_limpo <- sits_som_map(
 ## Visualizar mapa SOM limpo
 
 windows(width = 9, height = 7)
-plot(som_cluster_limpo, band = "DBSI")
-plot(som_cluster_limpo, band = "NDVI")
+plot(som_cluster_limpo, band = "B02")
+plot(som_cluster_limpo, band = "B04")
 plot(som_cluster_limpo, band = "B11")
 
 # Avaliar matriz de confusão das amostras antes e após filtragem ------------------------------------------------------------------------------------------
@@ -400,7 +400,7 @@ dir.create(tempdir_r, showWarnings = FALSE)
 
 reclas_masc_map_class <- sits_reclassify(
   cube                         = cubo_map_class, # Cubo do mapa classificado
-  mask                         = prodes_2020_2B, # Cubo da máscara PRODES
+  mask                         = masc_prodes, # Cubo da máscara PRODES
   rules                        = list(
     "Mascara_PRODES_2000-2019" = mask == "mascara",
     "Supressao"                = cube == "supressao",
