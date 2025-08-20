@@ -205,7 +205,7 @@ view(cubo_indices_bandas)
 
 # Treinar modelo Random Forest ----------------------------------------------------------------------------------------------------------------------------
 
-## Treinar modelo com amostras limpas (VERIFICAR AMOSTRAS LIMPAS OU NÃO)
+## Treinar modelo com amostras limpas ou originais
 
 set.seed(03024)
 
@@ -307,14 +307,14 @@ map_class <- sits_label_classification(
 saveRDS(map_class, file = "map_class.rds")
 map_class <- readRDS("map_class.rds")
 
-## Visualizar mapa classificado
-
-### Definir cores das classes
+## Definir cores das classes
 
 sits_colors_set(tibble(
   name  = c("supressao", "veg_natural", "", "", "", "", "", ""),
   color = c("#bf812d", "#01665e", "", "", "", "", "", "")
 ))
+
+## Visualizar mapa classificado
 
 plot(map_class)
 class(map_class)
