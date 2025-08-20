@@ -91,7 +91,7 @@ cubo_amostras_bal <- sits_reduce_imbalance(
 
 ## Verificar proporção e nº de amostras balanceadas e não balanceadas
 
-summary(cubo_amostras) # Nº de amostras não balanceadas
+summary(cubo_amostras)     # Nº de amostras não balanceadas
 summary(cubo_amostras_bal) # Nº amostras balanceadas
 
 # Análise SOM ---------------------------------------------------------------------------------------------------------------------------------------------
@@ -107,11 +107,11 @@ sits_colors_set(tibble(
 
 som_cluster <- sits_som_map(
   data      = cubo_amostras_bal, # SOM feito com grupo de amostras balanceadas (VERIFICAR!)
-  grid_xdim = 10, # Grade eixo x. Aqui é 10 x 10 para gerar 100 neurônios
-  grid_ydim = 10, # Grade eixo y
-  distance  = "dtw", # Método de calcular a distância,
-  mode      = "pbatch", # Gera o mesmo mapa SOM a cada run
-  rlen      = 20 # Número de iterações (quantidade de vezes que o mapa é gerado
+  grid_xdim = 10,                # Grade eixo x. Aqui é 10 x 10 para gerar 100 neurônios
+  grid_ydim = 10,                # Grade eixo y
+  distance  = "dtw",             # Método de calcular a distância,
+  mode      = "pbatch",          # Gera o mesmo mapa SOM a cada run
+  rlen      = 20                 # Número de iterações (quantidade de vezes que o mapa é gerado
 )
 
 ## Visualizar mapa SOM
@@ -164,11 +164,11 @@ summary(samples_clean)
 
 som_cluster_limpo <- sits_som_map(
   data      = samples_clean, # SOM feito com o nosso grupo de amostras
-  grid_xdim = 10, # Aqui é 10 x 10 para gerar 100 neurônios
+  grid_xdim = 10,            # 10 x 10 para gerar 100 neurônios
   grid_ydim = 10,
-  mode      = "pbatch", # Gera o mesmo mapa SOM a cada run
-  distance  = "dtw", # Método para calcular a distância
-  rlen      = 20 # Número de iterações
+  mode      = "pbatch",      # Gera o mesmo mapa SOM a cada run
+  distance  = "dtw",         # Método para calcular a distância
+  rlen      = 20             # Número de iterações
 )
 
 ## Visualizar mapa SOM limpo
@@ -211,7 +211,7 @@ set.seed(03024)
 
 rf_model <- sits_train(
   samples   = samples_clean, # Se precisar de amostras originais --> all_samples
-  ml_method = sits_rfor() # Modelo Random Forest
+  ml_method = sits_rfor()    # Modelo Random Forest
 )
 
 ## Gráfico com as variávies mais importantes do modelo
@@ -223,7 +223,7 @@ plot(rf_model)
 set.seed(333)
 
 rfor_valid <- sits_kfold_validate(
-  samples    = samples_clean,
+  samples    = samples_clean, # Verificar amostras originais ou filtradas
   folds      = 5,
   ml_method  = sits_rfor(),
   multicores = 5
@@ -347,7 +347,7 @@ dir.create(tempdir_r, showWarnings = FALSE)
 cubo_map_class <- sits_cube(
   source     = "BDC",
   collection = "SENTINEL-2-16D",
-  data_dir   = tempdir_r, # A imagem classificada deve estar nesta pasta
+  data_dir   = tempdir_r,   # A imagem classificada deve estar nesta pasta
   parse_info = c(
     "satellite", "sensor",
     "tile", "start_date", "end_date",
@@ -400,7 +400,7 @@ dir.create(tempdir_r, showWarnings = FALSE)
 
 reclas_masc_map_class <- sits_reclassify(
   cube                         = cubo_map_class, # Cubo do mapa classificado
-  mask                         = masc_prodes, # Cubo da máscara PRODES
+  mask                         = masc_prodes,    # Cubo da máscara PRODES
   rules                        = list(
     "Mascara_PRODES_2000-2019" = mask == "mascara",
     "Supressao"                = cube == "supressao",
