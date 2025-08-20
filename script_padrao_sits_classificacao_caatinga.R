@@ -136,8 +136,8 @@ som_cluster <- sits_som_map(
   grid_ydim = 10, # Grade eixo y
   distance = "dtw", # Método de calcular a distância,
   mode = "pbatch", # Gera o mesmo mapa SOM a cada run
-  rlen = 20
-) # Número de iterações (quantidade de vezes que o mapa é gerado)
+  rlen = 20   # Número de iterações (quantidade de vezes que o mapa é gerado
+) 
 
 ## Visualizar mapa SOM
 
@@ -193,8 +193,8 @@ som_cluster_limpo <- sits_som_map(
   grid_ydim = 10,
   mode = "pbatch", # Gera o mesmo mapa SOM a cada run
   distance = "dtw", # Método para calcular a distância
-  rlen = 20
-) # Número de iterações
+  rlen = 20  # Número de iterações
+) 
 
 ## Visualizar mapa SOM limpo
 
@@ -236,8 +236,8 @@ set.seed(03024)
 
 rf_model <- sits_train(
   samples = samples_clean, # Se precisar de amostras originais --> all_samples
-  ml_method = sits_rfor()
-) # Modelo Random Forest
+  ml_method = sits_rfor() # Modelo Random Forest
+) 
 
 ## Gráfico com as variávies mais importantes do modelo
 
@@ -411,8 +411,8 @@ masc_prodes <- sits_cube(
   ),
   bands = "class",
   version = "v22", # Versão do mapa PRODES para não confundir com mapa classificado
-  labels = c("1" = "mascara", "2" = "NA")
-) # Verificar pixel da máscara, talvez reclassificar pixels
+  labels = c("1" = "mascara", "2" = "NA") # Verificar pixel da máscara
+) 
 
 view(masc_prodes)
 
@@ -430,7 +430,7 @@ reclas_masc_map_class <- sits_reclassify(
     "Mascara_PRODES_2000-2019" = mask == "mascara",
     "Supressao" = cube == "supressao",
     "Vegetacao_natural" = cube == "veg_natural"
-  ), # VERIFICAR
+  ), 
   multicores = 7,
   output_dir = tempdir_r,
   version = "reclass"
