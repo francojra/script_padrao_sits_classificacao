@@ -117,6 +117,7 @@ som_cluster <- sits_som_map(
 ## Visualizar mapa SOM
 
 windows(width = 9, height = 7)
+
 plot(som_cluster, band = "B02")
 plot(som_cluster, band = "B04")
 plot(som_cluster, band = "B11")
@@ -174,6 +175,7 @@ som_cluster_limpo <- sits_som_map(
 ## Visualizar mapa SOM limpo
 
 windows(width = 9, height = 7)
+
 plot(som_cluster_limpo, band = "B02")
 plot(som_cluster_limpo, band = "B04")
 plot(som_cluster_limpo, band = "B11")
