@@ -43,8 +43,6 @@ view(cubo$file_info)
 saveRDS(cubo, file = "cubo.rds")
 cubo <- readRDS("cubo.rds")
 
-# Calcular índices e adicionar ao cubo --------------------------------------------------------------------------------------------------------------------
-
 # Ler arquivo .shp com amostras por classes ---------------------------------------------------------------------------------------------------------------
 
 amostras_classes <- sf::read_sf("amostras_classes.shp")
@@ -53,9 +51,9 @@ amostras_classes <- sf::read_sf("amostras_classes.shp")
 
 cubo_amostras <- sits_get_data(
   cubo_tile034018_entorno_g4_2b,       # Cubo geral com bandas e índices
-  samples    = "",                     # Arquivo shapefile do tile 034018
+  samples    = "",                     # Arquivo shapefile 
   label_attr = "",                     # Coluna que indica as classes das amostras (pontos)
-  bands      = c("", "", "", ""),      # Seleção de bandas das amostras
+  bands      = c("", "", "", ""),      # Seleção de bandas e índices do cubo
   memsize    = 8,                      # consumo de memória
   multicores = 2,                      # Número de núcleos usados. Quanto maior, mais rápido 
   progress   = TRUE                    # Acompanhar carregamento
