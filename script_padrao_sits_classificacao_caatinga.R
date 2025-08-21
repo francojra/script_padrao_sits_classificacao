@@ -241,6 +241,7 @@ dir.create(tempdir_r, showWarnings = FALSE, recursive = TRUE)
 probs_class <- sits_classify(
   data       = cubo_indices_bandas,
   ml_model   = rf_model,
+  exclusion_mask = "", # Arquivo .shp
   multicores = 3,
   memsize    = 8,
   output_dir = tempdir_r
