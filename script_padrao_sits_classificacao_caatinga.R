@@ -201,9 +201,9 @@ avaliacao_som_limpo
 
 ## Leitura do cubo criado (primeiro cubo) com bandas e índices selecionados
 
-cubo_indices_bandas <- readRDS("cubo_indices_bandas.rds")
+cubo <- readRDS("cubo.rds")
 
-view(cubo_indices_bandas)
+view(cubo)
 
 # Treinar modelo Random Forest ----------------------------------------------------------------------------------------------------------------------------
 
